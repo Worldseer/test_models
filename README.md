@@ -18,7 +18,7 @@ AxialGO+ is a protein function prediction model built by the [AxialNet](https://
 * data_2016：The 2016 dataset we used, includes training, validation and test sets and  the go.obo file
 
 ## Scripts
-
+- train_axialgo.py：used to train axialgo and output prediction files
 - generate_data_loader_all.py：generate six styles of embedded winding matrix, use the trainloader function in it to generate an iterable DataLoader. The DataLoader has two outputs which are x list of matrices containing six winding styles and y is the true label.
 - axialnet.py: contains AxialNet backbone network code, used to build AxialGO
 - resnet.py: contains the ResNet backbone network code
