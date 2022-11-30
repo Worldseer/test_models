@@ -2,6 +2,7 @@ import os
 import math
 import torch
 import torch.nn as nn
+import click as ck
 import numpy as np
 import pandas as pd
 import pickle
@@ -26,28 +27,28 @@ from script import create_model
     '--emb-dim', '-ed', default=16,
     help='Embedding Dim')
 @ck.option(
-    '--Msize', '-ms', default=16,
+    '--winding-size', '-ms', default=40,
     help='Winding matrix size')
 
 
 
-def main():
+def main(data_root,batch_size,epochs,emb_dim,winding_size):
     device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
-    go = Ontology('{data_root}/go.obo', with_rels=True)
+    go = Ontology(f'{data_root}/go.obo', with_rels=True)
     go_list = pd.read_pickle(f'{data_root}/terms.pkl') 
-    train_df = pd.read_pickle(f'{data_root}/train_data.pkl')
-    valid_df = pd.read_pickle(f'{data_root}/valid_data.pkl')
+    train_df = pd.read_pickle(f'{data_root}/train_data_train.pkl')
+    valid_df = pd.read_pickle(f'{data_root}/train_data_valid.pkl')
     test_df = pd.read_pickle(f'{data_root}/test_data.pkl') 
     out_file = os.path.join(f'predict/prediction_axialgo.pkl')
-    trainloader = generate_data_loader_all.trainloader(train_df,go_list,Msize,batch_size)
-    validloader = generate_data_loader_all.trainloader(valid_df,go_list,Msize,batch_size)
-    testloader = generate_data_loader_all.trainloader(test_df,go_list,Msize,batch_size,shuffle=False)
-    model = create_model.AxialGO()
+    trainloader = generate_data_loader_all.trainloader(train_df,go_list,winding_size,batch_size)
+    validloader = generate_data_loader_all.trainloader(valid_df,go_list,winding_size,batch_size)
+    testloader = generate_data_loader_all.trainloader(test_df,go_list,winding_size,batch_size,shuffle=False)
+    model = create_model.AxialGO(emb_dim,winding_size,len(go_list))
     model.to(device)
     loss_fn = nn.BCELoss()
     optimizer =  torch.optim.SGD(model.parameters(),lr=0.3,weight_decay=1e-5,momentum=0.9) 
     # optimizer = torch.optim.Adam(model.parameters(),lr=lr)
-    terms = go_list['gos'].values.flatten()
+    terms = go_list['terms'].values.flatten()
     terms_dict = {v: i for i, v in enumerate(terms)}
     n_terms = len(terms_dict)
     best_loss = 1000000.0
