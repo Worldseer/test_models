@@ -38,12 +38,12 @@ def main(data_root,batch_size,epochs,emb_dim,winding_size):
     train_df = pd.read_pickle(f'{data_root}/train_data_train.pkl')
     valid_df = pd.read_pickle(f'{data_root}/train_data_valid.pkl')
     test_df = pd.read_pickle(f'{data_root}/test_data.pkl') 
-    out_file = os.path.join(f'./prediction_axialgo.pkl')
+    out_file = os.path.join(f'./prediction_axialgo.pkl') #Output path for prediction.pkl
     trainloader = generate_data_loader_all.trainloader(train_df,go_list,winding_size,batch_size)
     validloader = generate_data_loader_all.trainloader(valid_df,go_list,winding_size,batch_size)
-    testloader = generate_data_loader_all.trainloader(test_df,go_list,winding_size,batch_size,shuffle=False)
-    model = create_model.AxialGO(emb_dim,winding_size,len(go_list))
-    model.to(device)
+    testloader = generate_data_loader_all.trainloader(test_df,go_list,winding_size,batch_size,shuffle=False) #cecause the prediction.pkl is generated without disruption
+    model = create_model.AxialGO(emb_dim,winding_size,len(go_list)) #Generate new AxialGO
+    model.to(device) 
     loss_fn = nn.BCELoss()
     optimizer =  torch.optim.SGD(model.parameters(),lr=0.3,weight_decay=1e-5,momentum=0.9) 
     # optimizer = torch.optim.Adam(model.parameters(),lr=lr)
@@ -59,14 +59,14 @@ def main(data_root,batch_size,epochs,emb_dim,winding_size):
         for idx,(X,y) in enumerate(trainloader):
             model.zero_grad()
             y = y.to(device)
-            y_pre = model(X[0].to(device))
+            y_pre = model(X[0].to(device)) #winding style a-f corresponds to X[0]-X[5] respectively
             loss = loss_fn(y_pre,y)
             loss.backward()
             print(loss)
             optimizer.step()
             train_loss += loss.detach().item()
         model.eval()
-        with torch.no_grad():
+        with torch.no_grad(): #Evaluation of the validation dataset, with no update of the gradient
             Loss = 0
             valid_loss = 0
             preds = []
@@ -80,18 +80,18 @@ def main(data_root,batch_size,epochs,emb_dim,winding_size):
                 valid_labels = np.append(valid_labels, y.detach().cpu().numpy())
             print(f'Epoch {epoch}: Loss - {train_loss}, Valid loss - {valid_loss}')
             
-            if valid_loss < best_loss:
-                if save_path!=None:
+            if valid_loss < best_loss: #Save the model with the minimum loss in the validation set
+                if save_path!=None: #Delete the old model
                     os.remove(save_path)
                 best_loss = valid_loss
-                save_path = os.path.join(f"./model/" +"AxialGO_valid_loss_"+ str("%.4f"%float(valid_loss)) +".param")
+                save_path = os.path.join(f"./model/" +"AxialGO_valid_loss_"+ str("%.4f"%float(valid_loss)) +".param") #Save the best model
                 torch.save(model.state_dict(), save_path)
      
 
     print("------------Load BEST Model----------------")
     print(save_path)
-    model_test = create_model.AxialGO(emb_dim,winding_size,len(go_list))
-    model_test.load_state_dict(torch.load(save_path)) 
+    model_test = create_model.AxialGO(emb_dim,winding_size,len(go_list)) #Generate new parameters
+    model_test.load_state_dict(torch.load(save_path)) #Load the best model 
     model_test.to(device)
     model_test.eval()
     with torch.no_grad():
