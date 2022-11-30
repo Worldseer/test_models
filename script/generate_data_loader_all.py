@@ -1,3 +1,4 @@
+#具有shuffle的dataloader，用seed
 import torch
 import numpy as np
 from torch.utils.data import Dataset
@@ -26,7 +27,7 @@ def expand_sequence(sequence,expand_len):
     else:
         return sequence+"*"*(expand_len-len(sequence))
         
-def genimatrix1(sequence,out_size): #winding style a and c
+def genimatrix1(sequence,out_size): #x,y分别记录当前数据的坐标,默认值是(0,0),sequence是已经转换成数值表示的序列
     W,H = effectivelen(sequence,out_size),effectivelen(sequence,out_size)
     matrix = torch.zeros((out_size,out_size))
     if len(sequence) >W*H: 
@@ -48,7 +49,7 @@ def genimatrix1(sequence,out_size): #winding style a and c
 
 
         
-def genimatrix2(sequence,out_size): #winding style b and d
+def genimatrix2(sequence,out_size): #x,y分别记录当前数据的坐标,默认值是(0,0),sequence是已经转换成数值表示的序列
     flag = 0 
     W,H = effectivelen(sequence,out_size),effectivelen(sequence,out_size)
     matrix = torch.zeros((out_size,out_size))
@@ -82,7 +83,7 @@ def genimatrix2(sequence,out_size): #winding style b and d
                 continue      
     return torch.LongTensor(matrix.numpy())
 
-def genimatrix3(sequence,out_size): ##winding style c and f
+def genimatrix3(sequence,out_size): 
         flag = 0
         W,H = effectivelen(sequence,out_size),effectivelen(sequence,out_size)
         matrix = torch.zeros((out_size,out_size))
@@ -157,21 +158,21 @@ def token2num(seq):#output torch.out_size([2304])
     return data    
 
     
-class traindataset(Dataset):
+class traindataset(Dataset):#蛋白质序列表示成num表示，标签为0/1矩阵，表示存在的Go术语,x表示起始横坐标，y表示起始纵坐标，w为图的宽，h为图的高
     def __init__(self,protein_df,go_df,out_size):
         super(traindataset,self).__init__()
         self.protein_df = protein_df
         self.go_dict = list_to_dict(go_df.terms.values)
         self.length = len(protein_df)
-        self.out_size = out_size #winding matrix size
+        self.out_size = out_size
 
         
     def __len__(self):
         return self.length
     
-    def __getitem__(self,idx):#idx start from 0
+    def __getitem__(self,idx):#idx从0开始
         labels = torch.zeros(len(self.go_dict), dtype=torch.float32)
-        seq = self.protein_df.iloc[idx].sequences
+        seq = self.protein_df.iloc[idx].sequences#取出对应的蛋白质序列
         expand_seq = expand_sequence(seq,self.out_size*self.out_size)
         # emb_data = token2num(expand_seq)
         imatrix1  = genimatrix1(seq,self.out_size)
@@ -188,7 +189,7 @@ class traindataset(Dataset):
         
 
 
-def trainloader(data_df,go_df,imageout_size,batchout_size,shuffle=True):
+def trainloader(data_df,go_df,imageout_size,batchout_size,shuffle=True):#输入df数据，输出DataLoader字典
     dataloader = DataLoader(dataset=traindataset(data_df,go_df,imageout_size),shuffle=shuffle,batch_size=batchout_size,num_workers=6)
     return dataloader
 

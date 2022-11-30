@@ -28,10 +28,11 @@ from script import create_model
 @ck.option(
     '--Msize', '-ms', default=16,
     help='Winding matrix size')
-device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
+
 
 
 def main():
+    device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
     go = Ontology('{data_root}/go.obo', with_rels=True)
     go_list = pd.read_pickle(f'{data_root}/terms.pkl') 
     train_df = pd.read_pickle(f'{data_root}/train_data.pkl')
