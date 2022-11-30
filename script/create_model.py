@@ -6,7 +6,7 @@ from . import axialnet,resnet,googlenet,vgg,alexnet
 
 
 class AxialGO(nn.Module):
-    def __init__(self,emb_dim,Msize,num_classes,mlp_expand=2):
+    def __init__(self,emb_dim,winding_size,num_classes,mlp_expand=2):
         super(AxialGO, self).__init__()
         self.emb_1 = nn.Embedding(21,emb_dim,padding_idx=0)
         self.emb_2 = nn.Embedding(42,emb_dim,padding_idx=0)
@@ -14,9 +14,9 @@ class AxialGO(nn.Module):
         self.r = int(math.sqrt(emb_dim))
         self.pixel_shuffle = nn.PixelShuffle(self.r)
         #axial26s
-        self.backbone = axialnet.AxialAttentionNet(axialnet.AxialBlock,[1, 2, 4, 1],in_dim=3, s=0.5, con2d_groups=1, groups=8, image_size=Msize*self.r)
+        self.backbone = axialnet.AxialAttentionNet(axialnet.AxialBlock,[1, 2, 4, 1],in_dim=3, s=0.5, con2d_groups=1, groups=8, image_size=winding_size*self.r)
         #axial50s
-        #self.backbone = axialnet.AxialAttentionNet(axialnet.AxialBlock,[3, 4, 6, 3],in_dim=3, s=0.5, con2d_groups=1, groups=8, image_size=Msize*self.r)
+        #self.backbone = axialnet.AxialAttentionNet(axialnet.AxialBlock,[3, 4, 6, 3],in_dim=3, s=0.5, con2d_groups=1, groups=8, image_size=winding_size*self.r)
         self.out = nn.Sequential(
             nn.Linear(1024*1, 1024*mlp_expand),
             nn.BatchNorm1d(1024*mlp_expand),
@@ -41,7 +41,7 @@ class AxialGO(nn.Module):
 #The dimensionality of Linear's input needs to vary 
 #according to the different backbone networks
 class OtherBackBone(nn.Module):
-    def __init__(self,emb_dim,Msize,num_classes,mlp_expand=2):
+    def __init__(self,emb_dim,num_classes,mlp_expand=2):
         super(OtherBackBone, self).__init__()
         self.emb_1 = nn.Embedding(21,emb_dim,padding_idx=0)
         self.emb_2 = nn.Embedding(42,emb_dim,padding_idx=0)
