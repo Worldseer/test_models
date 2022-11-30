@@ -2,3 +2,28 @@
 
 AxialGO+ is a protein function prediction model built by the [AxialNet](https://github.com/Worldseer/axial-deeplab) backbone network using only protein features. The model structure is shown in the figure below.
 ![AxialGO](https://github.com/Worldseer/AxialGO/blob/main/images/AxialGO.jpg)
+
+## Dependencies
+
+* The code was developed and tested using python 3.8.3.
+* We provide the dependencies to install the conda environment, first you need to install [ananconda](https://docs.anaconda.com/anaconda/install/index.html) on your computer, and then install the dependencies use:
+  `conda create --name <env> --file requirements.txt`
+* Install [diamond](https://github.com/bbuchfink/diamond) program on your system (diamond command should be available)
+
+
+
+## Data
+
+* data_cafa3：The CAFA3 dataset we used, includes training, validation and test sets and  the go.obo file
+* data_2016：The 2016 dataset we used, includes training, validation and test sets and  the go.obo file
+
+## Scripts
+
+- generate_data_loader_all.py：generate six styles of embedded winding matrix, use the trainloader function in it to generate an iterable DataLoader. The DataLoader has two outputs which are x list of matrices containing six winding styles and y is the true label.
+- axialnet.py: contains AxialNet backbone network code, used to build AxialGO
+- resnet.py: contains the ResNet backbone network code
+- googlenet.py: contains GoogLeNet backbone network code
+- vgg.py: contains the VGG backbone network code
+- alexnet.py: contains the alexnet backbone network code
+- create_model.py: contains  code for building AxialGO and code for using other backbone network models
+- utils.py: codes for Gene Ontology terms
