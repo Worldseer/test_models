@@ -108,8 +108,7 @@ def main(data_root,batch_size,epochs,emb_dim,winding_size):
             test_labels = np.append(test_labels, y.detach().cpu().numpy())
         test_loss /= idx
         preds = preds.reshape(-1, n_terms)
-        roc_auc = compute_roc(test_labels, preds)
-        print(f'Test Loss - {test_loss}, AUC - {roc_auc}')  
+        print(f'Test Loss - {test_loss}')  
         preds = list(preds)
         
     # Propagate scores using ontology structure
