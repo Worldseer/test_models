@@ -2,11 +2,10 @@ import math
 import torch
 import torch.nn as nn 
 from . import axialnet,resnet,googlenet,vgg,alexnet
-
 #axial26s
-backbone_axial26s = axialnet.AxialAttentionNet(axialnet.AxialBlock,[1, 2, 4, 1],in_dim=3, s=0.5, con2d_groups=1, groups=8, image_size=Msize*self.r)
+backbone_axial26s = axialnet.AxialAttentionNet(axialnet.AxialBlock,[1, 2, 4, 1],in_dim=3, s=0.5, con2d_groups=1, groups=8, image_size=40*self.r)
 #axial50s
-backbone_axial50s = axialnet.AxialAttentionNet(axialnet.AxialBlock,[3, 4, 6, 3],in_dim=3, s=0.5, con2d_groups=1, groups=8, image_size=Msize*self.r)
+backbone_axial50s = axialnet.AxialAttentionNet(axialnet.AxialBlock,[3, 4, 6, 3],in_dim=3, s=0.5, con2d_groups=1, groups=8, image_size=40*self.r)
 #resnet26
 backbone_resnet26 = resnet.ResNet(resnet.Bottleneck, [1, 2, 4, 1])
 #resnet50
@@ -19,7 +18,7 @@ backbone_vgg = vgg.vgg19_bn()
 backbone_alexnet = alexnet.AlexNet()
 
 class AxialGO(nn.Module):
-    def __init__(self,emb_dim,Msize,num_classes,mlp_expand=2):
+    def __init__(self,emb_dim,num_classes,mlp_expand=2):
         super(AxialGO, self).__init__()
         self.emb_1 = nn.Embedding(21,emb_dim,padding_idx=0)
         self.emb_2 = nn.Embedding(42,emb_dim,padding_idx=0)
