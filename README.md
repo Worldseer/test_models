@@ -14,8 +14,8 @@ AxialGO+ is a protein function prediction model built by the [AxialNet](https://
 
 ## Data
 
-* data_cafa3：The CAFA3 dataset we used, includes training, validation and test sets and  the go.obo file
-* data_2016：The 2016 dataset we used, includes training, validation and test sets and  the go.obo file
+* data_cafa3/：The CAFA3 dataset we used, includes training, validation and test sets and  the go.obo file
+* data_2016/：The 2016 dataset we used, includes training, validation and test sets and  the go.obo file
 
 ## Scripts
 - train_axialgo.py：used to train axialgo and output prediction files
