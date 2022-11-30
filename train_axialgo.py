@@ -85,7 +85,7 @@ def main(data_root,batch_size,epochs,emb_dim,winding_size):
                 if save_path!=None:
                     os.remove(save_path)
                 best_loss = valid_loss
-                save_path = os.path.join(f"./model/" +"AxialGO_Adam_11_21_epochs_50_"+str(on) +"_saved_epoch_" +str(epoch) +"_valid_loss_"+ str("%.4f"%float(valid_loss)) +".param")
+                save_path = os.path.join(f"./model/" +"AxialGO_valid_loss_"+ str("%.4f"%float(valid_loss)) +".param")
                 torch.save(model.state_dict(), save_path)
      
 
