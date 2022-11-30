@@ -91,7 +91,7 @@ def main(data_root,batch_size,epochs,emb_dim,winding_size):
 
     print("------------Load BEST Model----------------")
     print(save_path)
-    model_test = create_model.AxialGO()
+    model_test = create_model.AxialGO(emb_dim,winding_size,len(go_list))
     model_test.load_state_dict(torch.load(save_path)) 
     model_test.to(device)
     model_test.eval()
