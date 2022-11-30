@@ -8,7 +8,7 @@ AxialGO+ is a protein function prediction model built by the [AxialNet](https://
 * The code was developed and tested using python 3.8.3.
 * We provide the dependencies to install the conda environment, first you need to install [ananconda](https://docs.anaconda.com/anaconda/install/index.html) on your computer, and then install the dependencies use:
   `conda create --name <env> --file requirements.txt`
-* Install [diamond](https://github.com/bbuchfink/diamond) program on your system (diamond command should be available)
+* For the integration of AixalGO and DiamondScore to obtain AxialGO+, the [diamond](https://github.com/bbuchfink/diamond) package needs to be installed.
 
 
 
