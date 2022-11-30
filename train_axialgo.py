@@ -78,8 +78,7 @@ def main(data_root,batch_size,epochs,emb_dim,winding_size):
                 valid_loss += loss.detach().item()
                 preds = np.append(preds, y_pre.detach().cpu().numpy())
                 valid_labels = np.append(valid_labels, y.detach().cpu().numpy())
-            roc_auc = compute_roc(valid_labels, preds)
-            print(f'Epoch {epoch}: Loss - {train_loss}, Valid loss - {valid_loss}, AUC - {roc_auc}')
+            print(f'Epoch {epoch}: Loss - {train_loss}, Valid loss - {valid_loss}')
             
             if valid_loss < best_loss:
                 if save_path!=None:
