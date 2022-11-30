@@ -1,4 +1,3 @@
-#具有shuffle的dataloader，用seed
 import torch
 import numpy as np
 from torch.utils.data import Dataset
@@ -27,7 +26,7 @@ def expand_sequence(sequence,expand_len):
     else:
         return sequence+"*"*(expand_len-len(sequence))
         
-def genimatrix1(sequence,out_size): #x,y分别记录当前数据的坐标,默认值是(0,0),sequence是已经转换成数值表示的序列
+def genimatrix1(sequence,out_size): #winding style a and c
     W,H = effectivelen(sequence,out_size),effectivelen(sequence,out_size)
     matrix = torch.zeros((out_size,out_size))
     if len(sequence) >W*H: 
@@ -49,7 +48,7 @@ def genimatrix1(sequence,out_size): #x,y分别记录当前数据的坐标,默认
 
 
         
-def genimatrix2(sequence,out_size): #x,y分别记录当前数据的坐标,默认值是(0,0),sequence是已经转换成数值表示的序列
+def genimatrix2(sequence,out_size): #winding style b and d
     flag = 0 
     W,H = effectivelen(sequence,out_size),effectivelen(sequence,out_size)
     matrix = torch.zeros((out_size,out_size))
@@ -83,7 +82,7 @@ def genimatrix2(sequence,out_size): #x,y分别记录当前数据的坐标,默认
                 continue      
     return torch.LongTensor(matrix.numpy())
 
-def genimatrix3(sequence,out_size): 
+def genimatrix3(sequence,out_size): ##winding style c and f
         flag = 0
         W,H = effectivelen(sequence,out_size),effectivelen(sequence,out_size)
         matrix = torch.zeros((out_size,out_size))
