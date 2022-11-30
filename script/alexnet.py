@@ -12,8 +12,8 @@ import torch
 import torch.nn as nn
 
 class AlexNet(nn.Module):
-    super(AlexNet, self).__init__()
     def __init__(self):
+        super(AlexNet, self).__init__()
         self.net = nn.Sequential(
             nn.Conv2d(3, 96, kernel_size=11, stride=4, padding=1), 
             nn.ReLU(),
