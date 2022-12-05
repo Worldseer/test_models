@@ -30,7 +30,6 @@ class AxialAttention(nn.Module):
         self.width = width #False
 
         # Multi-head self attention
-        #qkv_transform为con1d,使用kernel_size=1卷积核,将输入的形状从in_planes转换为out_planes*2
         
         
         self.qkv_transform = qkv_transform(in_planes, out_planes * 2, kernel_size=1, stride=1,
@@ -60,7 +59,7 @@ class AxialAttention(nn.Module):
         else:
             x = x.permute(0, 3, 1, 2)  # N, W, C, H
         N, W, C, H = x.shape
-        x = x.contiguous().view(N * W, C, H)#将x变成在内存中连续分布的形式
+        x = x.contiguous().view(N * W, C, H)#Turn x into a continuous distribution in memory
 
         # Transformations
         qkv = self.bn_qkv(self.qkv_transform(x))
@@ -121,12 +120,9 @@ class AxialBlock(nn.Module):
 
     def forward(self, x):
         identity = x
-        # print(x.shape)
         out = self.conv_down(x)
         out = self.bn1(out)
         out = self.relu(out)
-        # print(x.shape)
-        # print(out.shape)
         out = self.hight_block(out)
         out = self.width_block(out)
         out = self.relu(out)
@@ -136,8 +132,6 @@ class AxialBlock(nn.Module):
 
         if self.downsample is not None:
             identity = self.downsample(x)
-        # print(identity.shape)
-        # print(out.shape)
         out += identity
         out = self.relu(out)
 
@@ -183,7 +177,6 @@ class AxialAttentionNet(nn.Module):
                                        dilate=replace_stride_with_dilation[1])
         self.layer4 = self._make_layer(block, int(1024 * s), layers[3], stride=2, kernel_size=int(image_size/16),
                                        dilate=replace_stride_with_dilation[2])
-        # self.avgpool = nn.AdaptiveMaxPool2d((1, 1))
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1)) 
         for m in self.modules():
             if isinstance(m, (nn.Conv2d, nn.Conv1d)):
@@ -238,15 +231,10 @@ class AxialAttentionNet(nn.Module):
         x = self.bn1(x)
         x = self.relu(x)
         x = self.maxpool(x)
-        # print(x.shape) #32, 24, 24
         x = self.layer1(x)
-        # print(x.shape) #128, 24, 24
         x = self.layer2(x)
-        # print(x.shape)
         x = self.layer3(x)
-        # print(x.shape)
         x = self.layer4(x)
-        # print(x.shape)
         x = self.avgpool(x)
         x = torch.flatten(x, 1)
         # x = self.fc(x)
@@ -254,81 +242,7 @@ class AxialAttentionNet(nn.Module):
 
     def forward(self, x):
         return self._forward_impl(x)
-
-class AxialGO(nn.Module):
-
-    def __init__(self,emb_dim,num_classes):
-        super(AxialGO, self).__init__()
-        self.emb = nn.Embedding(21,emb_dim,padding_idx=0)
-        self.axialnet_1 = AxialAttentionNet(AxialBlock, [3, 4, 6, 3], s=1, in_dim=emb_dim)
-        self.axialnet_2 = AxialAttentionNet(AxialBlock, [3, 4, 6, 3], s=1, in_dim=emb_dim)
-        self.axialnet_3 = AxialAttentionNet(AxialBlock, [3, 4, 6, 3], s=1, in_dim=emb_dim)
-        self.out = nn.Sequential(
-            nn.Dropout(0.5),
-            nn.Linear(2048*3, num_classes),
-            nn.Sigmoid()
-        )
         
-    def forward(self,x1,x2,x3):
-        x1 = self.emb(x1).permute(0,3,1,2)
-        x2 = self.emb(x2).permute(0,3,1,2)
-        x3 = self.emb(x3).permute(0,3,1,2)
-        x1 = self.axialnet_1(x1)
-        x2 = self.axialnet_2(x2)
-        x3 = self.axialnet_3(x3)
-        x = self.out(torch.cat((x1,x2,x3),dim=1))
-        return x
-        
-class deepgocnn(nn.Module):
-    def __init__(self, in_dim, hid_dim, maxpool_len=2304):
-        super(deepgocnn, self).__init__()
-        self.maxpool_len = maxpool_len
-        self.kernels = range(16, 129, 16)  # len=16
-        for i in range(16, 129, 16):
-            setattr(self, 'con_%s' % str(i), self._block(in_dim, hid_dim, kernel_size=i))
-
-    def forward(self, x):
-        nets = []
-        for i in self.kernels:
-            nets.append(getattr(self, 'con_%s' % str(i))(x))
-        y = torch.cat(nets, dim=1)  # torch.Size([1, 8192])
-        return y
-
-    def _block(self, in_dim, hid_dim, kernel_size):
-        return nn.Sequential(
-            nn.Conv1d(in_dim, hid_dim, kernel_size=kernel_size, padding="same"),  # torch.Size([1,512,2000])
-            nn.MaxPool1d(self.maxpool_len),  # torch.Size([1,512,1])
-            nn.Flatten()  # torch.Size([1, 512])
-        )
-        
-class DeepAxialGO(nn.Module):  # axialgo+deepgoplus
-
-    def __init__(self, emb_dim, num_classes):
-        super(DeepAxialGO, self).__init__()
-        self.emb = nn.Embedding(21, emb_dim, padding_idx=0)
-        self.deepgocnn = deepgocnn(emb_dim, 512, 2000)
-        self.axialnet_1 = AxialAttentionNet(AxialBlock, [3, 4, 6, 3], s=0.5, emb_dim=emb_dim)
-        self.axialnet_2 = AxialAttentionNet(AxialBlock, [3, 4, 6, 3], s=0.5, emb_dim=emb_dim)
-        self.axialnet_3 = AxialAttentionNet(AxialBlock, [3, 4, 6, 3], s=0.5, emb_dim=emb_dim)
-        self.out = nn.Sequential(
-            nn.Dropout(0.3),
-            nn.Linear(4096 + 1024 * 3, num_classes),
-            nn.Sigmoid()
-        )
-
-    def forward(self, x0, x1, x2, x3):
-        x0 = self.emb(x0).permute(0, 2, 1)
-        x1 = self.emb(x1).permute(0, 3, 1, 2)
-        x2 = self.emb(x2).permute(0, 3, 1, 2)
-        x3 = self.emb(x3).permute(0, 3, 1, 2)
-        x0 = self.deepgocnn(x0)
-        x1 = self.axialnet_1(x1)
-        x2 = self.axialnet_2(x2)
-        x3 = self.axialnet_3(x3)
-        x = self.out(torch.cat((x0, x1, x2, x3), dim=1))
-        return x
-        
-
 def axial26s(pretrained=False, **kwargs):
     model = AxialAttentionNet(AxialBlock, [1, 2, 4, 1], s=0.5, num_classes=3615, **kwargs)
     return model
