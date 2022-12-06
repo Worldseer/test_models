@@ -30,3 +30,6 @@ AxialGO+ is a protein function prediction model built by the [AxialNet](https://
 
 ## Trained model
 * model/: Contains the parameters of the model trained in the CAFA3 and 2016 datasets. Both model parameters provided are trained using the winding style (a), winding matrix size of 40 and embedding dimension of 16 from the paper.
+
+## Training model
+You can train the model directly with the default parameters by running `python train_axialgo.py` directly. Line 65 in the train_axialgo.py file will print the loss values to test if the model is working properly. We recommend commenting out this line if everything works
