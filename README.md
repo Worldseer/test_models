@@ -27,3 +27,6 @@ AxialGO+ is a protein function prediction model built by the [AxialNet](https://
 - alexnet.py: contains the alexnet backbone network code
 - create_model.py: contains  code for building AxialGO and code for using other backbone network models
 - utils.py: codes for Gene Ontology terms
+
+## Trained model
+* model/: Contains the parameters of the model trained in the CAFA3 and 2016 datasets. Both model parameters provided are trained using the winding style (a), winding matrix size of 40 and embedding dimension of 16 from the paper.
