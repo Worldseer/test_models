@@ -108,7 +108,7 @@ def main(train_data_file, test_data_file, terms_file, go_file,
     labels = list(map(lambda x: set(filter(lambda y: y in go_set, x)), labels))
     # print(len(go_set))
     deep_preds = []
-    # alphas = {NAMESPACES['mf']: 0.54, NAMESPACES['bp']: 0.60, NAMESPACES['cc']: 0.44}
+    # alphas = {NAMESPACES['mf']: 0.54, NAMESPACES['bp']: 0.60, NAMESPACES['cc']: 0.46}
     alphas = {NAMESPACES['mf']: 0, NAMESPACES['bp']: 0, NAMESPACES['cc']: 0}
 
     for i, row in enumerate(test_df.itertuples()):
