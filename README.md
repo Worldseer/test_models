@@ -35,7 +35,10 @@ AxialGO+ is a protein function prediction model built by the [AxialNet](https://
 - Training the model with default parameters:
 You can train the model directly with the default parameters by running `python train_axialgo.py`. Line 65 in the train_axialgo.py file will print the loss values to test if the model is working properly. We recommend commenting out this line if everything works
 - Training models with custom parameters:
-Please use:`python train.py --data-root ./data_2016 --epochs 100 --batch-size 16 --epochs 30 --emb-dim 16 --winding-size 40`
+Please use:
+```
+python train.py --data-root ./data_2016 --epochs 100 --batch-size 16 --epochs 30 --emb-dim 16 --winding-size 40
+```
 
 ## Evaluate prediction.pkl
 - Use the following command to evaluate the resulting prediction.pkl
