@@ -19,30 +19,27 @@ logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 
 @ck.command()
 @ck.option(
-    '--train-data-file', '-trdf', default='data/train_data.pkl',
+    '--train-data-file', '-trdf', default='./data_2016/train_data.pkl',
     help='Data file with training features')
 @ck.option(
-    '--test-data-file', '-tsdf', default='data/predictions.pkl',
+    '--test-data-file', '-tsdf', default='./predict/prediction_2016.pkl',
     help='Test data file')
 @ck.option(
-    '--terms-file', '-tf', default='data/terms.pkl',
+    '--terms-file', '-tf', default='./data_2016/terms.pkl',
     help='Data file with sequences and complete set of annotations')
 @ck.option(
-    '--go-file', '-gf', default='data/go.obo',
+    '--go-file', '-gf', default='./data_2016/go.obo',
     help='Test data file')    
 @ck.option(
-    '--diamond-scores-file', '-dsf', default='data/test_diamond.res',
+    '--diamond-scores-file', '-dsf', default='./data_2016/test_diamond.res',
     help='Diamond output')
 @ck.option(
     '--ont', '-o', default='mf',
     help='GO subontology (bp, mf, cc)')
-@ck.option(
-    '--alpha', '-a', default=50,
-    help='Alpha for for combining scores')
     
 
 def main(train_data_file, test_data_file, terms_file, go_file,
-         diamond_scores_file, ont, alpha):
+         diamond_scores_file, ont):
 
     go_rels = Ontology(go_file, with_rels=True)
     terms_df = pd.read_pickle(terms_file)
@@ -53,9 +50,9 @@ def main(train_data_file, test_data_file, terms_file, go_file,
     test_df = pd.read_pickle(test_data_file)
     print("Length of test set: " + str(len(test_df)))
     
-    annotations = train_df['prop_annotations'].values
+    annotations = train_df['annotations'].values
     annotations = list(map(lambda x: set(x), annotations))
-    test_annotations = test_df['prop_annotations'].values
+    test_annotations = test_df['annotations'].values
     test_annotations = list(map(lambda x: set(x), test_annotations))
     go_rels.calculate_ic(annotations + test_annotations)
 
@@ -107,17 +104,12 @@ def main(train_data_file, test_data_file, terms_file, go_file,
     # DeepGOPlus
     go_set = go_rels.get_namespace_terms(NAMESPACES[ont])
     go_set.remove(FUNC_DICT[ont])
-    labels = test_df['prop_annotations'].values
+    labels = test_df['annotations'].values
     labels = list(map(lambda x: set(filter(lambda y: y in go_set, x)), labels))
     # print(len(go_set))
     deep_preds = []
     # alphas = {NAMESPACES['mf']: 0.54, NAMESPACES['bp']: 0.58, NAMESPACES['cc']: 0.47}
     alphas = {NAMESPACES['mf']: 0, NAMESPACES['bp']: 0, NAMESPACES['cc']: 0}
-
-    with open(last_release_metadata, 'r') as f:
-        last_release_data = json.load(f)
-        alpha = last_release_data["alphas"][ont]
-        alphas[NAMESPACES[ont]] = alpha
 
     for i, row in enumerate(test_df.itertuples()):
         annots_dict = blast_preds[i].copy()
@@ -187,9 +179,9 @@ def main(train_data_file, test_data_file, terms_file, go_file,
     plt.ylabel('Precision')
     plt.title('Area Under the Precision-Recall curve')
     plt.legend(loc="lower right")
-    plt.savefig(f'results/aupr_{ont}_{alpha:0.2f}.pdf')
+    plt.savefig(f'./aupr_{ont}.pdf')
     df = pd.DataFrame({'precisions': precisions, 'recalls': recalls})
-    df.to_pickle(f'results/PR_{ont}_{alpha:0.2f}.pkl')
+    df.to_pickle(f'./PR_{ont}.pkl')
 
 def evaluate_annotations(go, real_annots, pred_annots):
     total = 0
