@@ -19,7 +19,7 @@ logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 
 @ck.command()
 @ck.option(
-    '--train-data-file', '-trdf', default='./data_2016/train_data.pkl',
+    '--train-data-file', '-trdf', default='./data_2016/train_data_train.pkl',
     help='Data file with training features')
 @ck.option(
     '--test-data-file', '-tsdf', default='./predict/prediction_2016.pkl',
@@ -130,7 +130,7 @@ def main(train_data_file, test_data_file, terms_file, go_file,
     smin = 1000000.0
     rus = []
     mis = []
-    for t in range(1, 101): # the range in this loop has influence in the AUPR output
+    for t in range(0, 101): 
         threshold = t / 100.0
         preds = []
         for i, row in enumerate(test_df.itertuples()):
