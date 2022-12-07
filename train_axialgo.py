@@ -38,7 +38,7 @@ def main(data_root,batch_size,epochs,emb_dim,winding_size):
     train_df = pd.read_pickle(f'{data_root}/train_data_train.pkl')
     valid_df = pd.read_pickle(f'{data_root}/train_data_valid.pkl')
     test_df = pd.read_pickle(f'{data_root}/test_data.pkl') 
-    out_file = os.path.join(f'./prediction_axialgo.pkl') #Output path for prediction.pkl
+    out_file = os.path.join(f'./predict/prediction_axialgo.pkl') #Output path for prediction.pkl
     trainloader = generate_data_loader_all.trainloader(train_df,go_list,winding_size,batch_size)
     validloader = generate_data_loader_all.trainloader(valid_df,go_list,winding_size,batch_size)
     testloader = generate_data_loader_all.trainloader(test_df,go_list,winding_size,batch_size,shuffle=False) #cecause the prediction.pkl is generated without disruption
