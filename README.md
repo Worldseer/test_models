@@ -40,7 +40,7 @@ You can train the model directly with the default parameters by running `python 
 - Training models with custom parameters,
 Please use:
 ```
-python train.py --data-root ./data_2016 --epochs 100 --batch-size 16 --epochs 30 --emb-dim 16 --winding-size 40
+python train_axialgo.py --data-root ./data_2016 --epochs 100 --batch-size 16 --epochs 30 --emb-dim 16 --winding-size 40
 ```
 
 ## Evaluate prediction.pkl
