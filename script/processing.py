@@ -220,7 +220,7 @@ def load_sequencedata(go_obo,sequence_gz_data):
                 prot_ac = items[1]
             elif items[0] == 'OX' and len(items) > 1:# Classification identifier, data source, e.g. human
                 if items[1].startswith('NCBI_TaxID='):
-                    org = items[1][11:]#取出来源ID
+                    org = items[1][11:]
                     end = org.find(' ')
                     org = org[:end]
                 else:
@@ -368,7 +368,7 @@ def df2go(go_obo, df):
 def split_train_test(go_obo,df_file,
          out_terms_file, train_data_file, test_data_file, min_count, train_percent):
     go = Ontology(go_obo)
-    #with_rels=True表示考虑regulate、has_part、part_of关系，都加入到is_a中
+    #with_rels=True means consider regulate, has_part, part_of relationships, all added to is_a
     df = pd.read_pickle(df_file)
     print("DATA FILE", len(df))
     cnt = Counter()
@@ -399,7 +399,7 @@ def split_train_test(go_obo,df_file,
     train_n = int(n * float(train_percent))
     np.random.seed(seed=0)
     np.random.shuffle(index)
-    train_df = df.iloc[index[:train_n],1:]#去除索引
+    train_df = df.iloc[index[:train_n],1:]
     train_df = train_df.reset_index(drop=True)
     test_df = df.iloc[index[train_n:],1:]
     test_df = test_df.reset_index(drop=True)
