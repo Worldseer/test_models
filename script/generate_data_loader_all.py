@@ -1,4 +1,3 @@
-#具有shuffle的dataloader，用seed
 import torch
 import numpy as np
 from torch.utils.data import Dataset
@@ -87,7 +86,7 @@ def genimatrix3(sequence,out_size):
         flag = 0
         W,H = effectivelen(sequence,out_size),effectivelen(sequence,out_size)
         matrix = torch.zeros((out_size,out_size))
-        if len(sequence) >W*H: #Truncate if len>2500
+        if len(sequence) >W*H: #Truncate if len>W*H
             sequence = sequence[0:W*H]
         x,y = 0,0
         step = 0
