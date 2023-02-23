@@ -6,6 +6,7 @@ import click as ck
 import logging
 import math
 import os
+from collections import deque, Counter
 from script.utils import FUNC_DICT, Ontology, NAMESPACES
 # from matplotlib import pyplot as plt
 

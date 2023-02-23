@@ -5,6 +5,7 @@ import pandas as pd
 import click as ck
 import logging
 import math
+from collections import deque, Counter
 import os
 from script.utils import FUNC_DICT, Ontology, NAMESPACES
 # from matplotlib import pyplot as plt
