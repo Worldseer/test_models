@@ -13,7 +13,7 @@ import math
 from script.utils import FUNC_DICT, Ontology, NAMESPACES
 from matplotlib import pyplot as plt
 import json
-
+import os
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 
 
