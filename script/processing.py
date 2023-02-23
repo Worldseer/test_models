@@ -50,7 +50,7 @@ class Ontology(object):
         cnt = Counter()
         for x in annots:
             cnt.update(x)
-        self.ic = {}#为字典
+        self.ic = {}
         for go_id, n in cnt.items(): 
         #If there is no parent term, ic is the number of occurrences of this go term
             parents = self.get_parents(go_id)
@@ -116,7 +116,6 @@ class Ontology(object):
                 ont[obj['id']] = obj
         for term_id in list(ont.keys()):
             for t_id in ont[term_id]['alt_ids']:
-            #如果有alt_ids,则添加一个与主id相同数据的alt_ids
                 ont[t_id] = ont[term_id]
         for term_id in list(ont.keys()):
             if ont[term_id]['is_obsolete']:#delete obsolete GO terms
