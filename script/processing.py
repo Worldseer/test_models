@@ -38,23 +38,21 @@ class Ontology(object):
         self.ont, self.obsoletegolist = self.loadgo(filename, with_rels)
         self.ic = None
 
-    def has_term(self, term_id):#返回该术语是否存在
+    def has_term(self, term_id):# Returns whether the term exists
         return term_id in self.ont
 
-    def get_term(self, term_id):#返回该术语的values
+    def get_term(self, term_id):#values returned for the term
         if self.has_term(term_id):
             return self.ont[term_id]
         return None
 
-    def calculate_ic(self, annots):#informance content计算：信息内容
+    def calculate_ic(self, annots):#informance content calculation
         cnt = Counter()
-        #collection模块的Counter函数，用来统计词出现的次数，返回一个类似字典的东西
-        for x in annots:#x应该是个字典,只包括GOterm如：{'GO:0002134'}
+        for x in annots:
             cnt.update(x)
         self.ic = {}#为字典
         for go_id, n in cnt.items(): 
-        #如果没有父术语，ic为此go术语出现的次数
-        #如果有父术语则为其所有术语中，出现次数最少的术语
+        #If there is no parent term, ic is the number of occurrences of this go term
             parents = self.get_parents(go_id)
             if len(parents) == 0:
                 min_n = n
@@ -121,12 +119,10 @@ class Ontology(object):
             #如果有alt_ids,则添加一个与主id相同数据的alt_ids
                 ont[t_id] = ont[term_id]
         for term_id in list(ont.keys()):
-            if ont[term_id]['is_obsolete']:#删除过期的GO术语
+            if ont[term_id]['is_obsolete']:#delete obsolete GO terms
                 del ont[term_id]
         for term_id, val in ont.items():
             if 'children' not in val:
-            #避免有的数据没有key=children,首先将所有的数据添加一条为空的key=children
-            #其实可以没有这一句
                 val['children'] = set()
             for p_id in val['is_a']:
                 if p_id in ont:
@@ -136,7 +132,7 @@ class Ontology(object):
         return ont,obsoletegolist
 
 
-    def get_anchestors(self, term_id):#返回所有的祖先术语
+    def get_anchestors(self, term_id):# Return all ancestral terms
         if term_id not in self.ont:
             return set()
         term_set = set()
@@ -145,14 +141,14 @@ class Ontology(object):
         while(len(q) > 0):
             t_id = q.popleft()
             if t_id not in term_set:
-                term_set.add(t_id)#也可以不用因为term_set为集合，集合无重复数据。因此这一步是为了优化处理时间
+                term_set.add(t_id)
                 for parent_id in self.ont[t_id]['is_a']:
                     if parent_id in self.ont:
                         q.append(parent_id)
         return term_set
 
 
-    def get_parents(self, term_id):#返回该术语的is_a的术语
+    def get_parents(self, term_id):
         if term_id not in self.ont:
             return set()
         term_set = set()
@@ -163,17 +159,17 @@ class Ontology(object):
 
 
     def get_namespace_terms(self, namespace):
-    #namespace取值有BP、MF和CC，该函数可以取出属于某个namespace的所有数据的go_id
+        #namespace takes the values BP, MF and CC, this function can retrieve the go_id of all data belonging to a namespace
         terms = set()
         for go_id, obj in self.ont.items():
             if obj['namespace'] == namespace:
                 terms.add(go_id)
         return terms
 
-    def get_namespace(self, term_id):#返回term_id属于的namespace（mf、bp、cc）
+    def get_namespace(self, term_id):#returns the namespace to which term_id belongs
         return self.ont[term_id]['namespace']
     
-    def get_term_set(self, term_id):#返回term和它的子术语
+    def get_term_set(self, term_id):# Return term and its subterms
         if term_id not in self.ont:
             return set()
         term_set = set()
@@ -210,7 +206,7 @@ def load_sequencedata(go_obo,sequence_gz_data):
         for line in f:
             items = line.strip().split('   ')
             if items[0] == 'ID' and len(items) > 1:
-                if prot_id != '':#读到一个新的ID值，如果prot_id有数据则将上次的数据添加到列表中
+                if prot_id != '':# Read a new ID value and add the last one to the list if prot_id has data
                     proteins.append(prot_id)
                     accessions.append(prot_ac)
                     sequences.append(seq)
@@ -218,12 +214,12 @@ def load_sequencedata(go_obo,sequence_gz_data):
                     interpros.append(ipros)
                     orgs.append(org)
                 prot_id = items[1]
-                annots = list()#数据类型为列表需要重置，数据类型如果为字符串可直接覆盖
-                ipros = list()#
+                annots = list()
+                ipros = list()
                 seq = ''
-            elif items[0] == 'AC' and len(items) > 1:#AC：access登录号，一个annotation可能有多个登录号
+            elif items[0] == 'AC' and len(items) > 1:#AC: access login number, one annotation may have multiple login numbers
                 prot_ac = items[1]
-            elif items[0] == 'OX' and len(items) > 1:#分类标识符，数据来源，如人类
+            elif items[0] == 'OX' and len(items) > 1:# Classification identifier, data source, e.g. human
                 if items[1].startswith('NCBI_TaxID='):
                     org = items[1][11:]#取出来源ID
                     end = org.find(' ')
@@ -241,7 +237,7 @@ def load_sequencedata(go_obo,sequence_gz_data):
                     ipro_id = items[1]
                     ipros.append(ipro_id)
             elif items[0] == 'SQ':
-                seq = next(f).strip().replace(' ', '')#把空格都去除
+                seq = next(f).strip().replace(' ', '')
                 while True:
                     sq = next(f).strip().replace(' ', '')
                     if sq == '//':
@@ -249,7 +245,7 @@ def load_sequencedata(go_obo,sequence_gz_data):
                     else:
                         seq += sq
 
-        #将最后一个数据添加到列表中
+        # Add the last data to the list
         proteins.append(prot_id)
         accessions.append(prot_ac)
         sequences.append(seq)
@@ -258,7 +254,7 @@ def load_sequencedata(go_obo,sequence_gz_data):
         orgs.append(org)
     return proteins, accessions, sequences, annotations, interpros, orgs 
 
-#processing_data删除了没有实验证据的数据，并进行了传播注释
+#processing_data removed data with no experimental evidence and propagation annotated
 def data2df(go_obo, sequence_gz_data):
     go = Ontology(go_obo)
     proteins, accessions, sequences, annotations, interpros, orgs = load_sequencedata(go_obo,sequence_gz_data)
@@ -281,19 +277,19 @@ def data2df(go_obo, sequence_gz_data):
         # Ignore proteins without experimental annotations
         if len(annots) == 0:
             continue
-        index.append(i)#将有实验证据的数据的索引存储到列表，没有的通过continue已经跳过
+        index.append(i)
         annotations.append(annots)
     df = df.iloc[index]
-    df = df.reset_index(drop=True)#将df的索引更新
-    df['exp_annotations'] = annotations#再df中添加一列，存储GO术语，没有证据代码
+    df = df.reset_index(drop=True)#Update the index of df
+    df['exp_annotations'] = annotations# Add another column to df to store GO terms, no evidence code
 
     prop_annotations = []
     for i, row in df.iterrows():
         # Propagate annotations
         annot_set = set()
-        annots = row['exp_annotations']#是包含的GO术语
+        annots = row['exp_annotations']
         for go_id in annots:
-            annot_set |= go.get_anchestors(go_id)#进行位运算
+            annot_set |= go.get_anchestors(go_id)
         annots = list(annot_set)
         prop_annotations.append(annots)
     df['prop_annotations'] = prop_annotations
@@ -304,7 +300,7 @@ def data2df(go_obo, sequence_gz_data):
             cafa_target.append(True)
         else:
             cafa_target.append(False)
-    df['cafa_target'] = cafa_target#添加一列，表示数据是否时cafa的分类目标
+    df['cafa_target'] = cafa_target# Add a column indicating whether the data is a classification target for cafa
     length = list()
     seqlist = df.sequences.values.flatten()
     for seq in seqlist:
@@ -369,7 +365,7 @@ def df2go(go_obo, df):
     return bpo,mfo,cco
 
 
-#去除数据少于min_count的go术语，按照train_percent进行train_test划分
+# Remove go terms with less data than min_count, divide train_test by train_percent
 def split_train_test(go_obo,df_file,
          out_terms_file, train_data_file, test_data_file, min_count, train_percent):
     go = Ontology(go_obo)
@@ -381,18 +377,18 @@ def split_train_test(go_obo,df_file,
     for i, row in df.iterrows():
         for term in row['prop_annotations']:
             cnt[term] += 1
-            #统计所有数据中每个GO术语的数量
-            #以便去除那些数据量不足的术语
+            #Count the number of each GO term in all data
+            #in order to remove those terms with insufficient data
     res = {}
-    #cnt包括GO术语和其出现的次数例：'GO:0010558': 836
+    #cnt includes the GO term and its occurrences. Example: 'GO:0010558': 836
     for key, val in cnt.items():
         if val >= int(min_count):
             ont = key.split(':')[0]
             if ont not in res:
                 res[ont] = []
-            res[ont].append(key)#res包括一个key：list即"GO"：["GO:0010558","'GO:2001141'"]
+            res[ont].append(key)
     terms = []
-    for key, val in res.items():#key为字符串"GO",val为包括GO术语的列表
+    for key, val in res.items():
         print(key, len(val))
         terms += val  
     # Save the list of terms
@@ -414,20 +410,19 @@ def split_train_test(go_obo,df_file,
 
     print('Number of test proteins', len(test_df))
     test_df.to_pickle(test_data_file)
-
-#不会保存验证数据，直接加载进内存    
+ 
 def split_train_valid(train_pickle,split_rate):
     df = pd.read_pickle(train_pickle)
-    n = len(df)#n表示有多少个数据
-    index = np.arange(n)#获取每个数据的索引，以便进行shuffle
-    train_n = int(n * split_rate)#计算训练数据的数量
+    n = len(df)
+    index = np.arange(n)#Get the index of each data for shuffle
+    train_n = int(n * split_rate)# Calculate the amount of training data
     np.random.seed(seed=0)
     np.random.shuffle(index)
     train_df = df.iloc[index[:train_n]]
     valid_df = df.iloc[index[train_n:]]
     return train_df, valid_df
     
-#统计某个namespace中go术语存在的蛋白质数据数量
+# count the number of protein data present in a namespace for a go term
 def computenum(go_obo,namespce,data_frame):
     go = Ontology(go_obo)
     cnt = Counter()
@@ -442,8 +437,8 @@ def computenum(go_obo,namespce,data_frame):
     return df
     
     
-#根据go术语列表，返回有其注释的所有蛋白质数据
-#其标签需要从term_num_df获得
+#returns all protein data with its annotations based on a list of go terms
+#its labels need to be obtained from term_num_df
 def data_under_go_list(term_num_df,data_frame):
     go_list = term_num_df.goterm.values.flatten()
     indexset = set()
