@@ -182,8 +182,8 @@ class Ontology(object):
 
 
     
-#统计GO术语的数量，将小于某个阈值的GO术语排除，返回GO术语
-#提取每个域中的数据
+# Count the number of GO terms, exclude GO terms that are less than a certain threshold, return GO terms
+# Extract the data in each domain
 def get_domain_df(go_obo, df):
     go = Ontology(go_obo)
     mf = set()
@@ -213,16 +213,16 @@ def get_domain_df(go_obo, df):
     
 def split_train(df,valid_percent):
     # df = pd.read_pickle(train_pickle)
-    n = len(df)#n表示有多少个数据
-    index = np.arange(n)#获取每个数据的索引，以便进行shuffle
-    valid_n = int(n * valid_percent)#计算训练数据的数量
+    n = len(df)
+    index = np.arange(n)
+    valid_n = int(n * valid_percent)
     np.random.seed(seed=0)
     np.random.shuffle(index)
     valid_df = df.iloc[index[:valid_n]]
     train_df = df.iloc[index[valid_n:]]
     return train_df, valid_df    
  
-#统计某个namespace中go术语存在的蛋白质数据数量
+# count the number of protein data present in a namespace for a go term
 def compute_num(go_obo,namespce,df):
     go = Ontology(go_obo)
     cnt = Counter()
@@ -236,8 +236,7 @@ def compute_num(go_obo,namespce,df):
     df = df.sort_values(by='num',ascending=False,ignore_index=True)
     return df    
  
- 
-#输入原始无划分domain的df,和go文件，实现划分数据集，输出goterm（少于某个阈值的排除），输出train_mf,valid_mf,train_bp,valid_bp,train_cc,valid_cc,go_mf,go_bp,go_cc
+
 def get_domain(go_obo, df, limit_go_num = False, split=False, valid_percent=0.1,min_count=50):
     cnt = Counter()
     for i, row in df.iterrows():
@@ -261,7 +260,7 @@ def get_domain(go_obo, df, limit_go_num = False, split=False, valid_percent=0.1,
     
         return mf_df, go_mf, bp_df, go_bp, cc_df, go_cc     
         
-#从df中得到.fasta文件 
+# get .fasta file from df 
 def get_fasta(df,targetpath):
     with open(targetpath,'w') as f:
         for idx,items in df.iterrows():
