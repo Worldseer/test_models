@@ -22,7 +22,7 @@ logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
     help='GO subontology (bp, mf, cc)')
 def main(data_path, ont):
 
-    train_data_file = os.path.join(data_path,'train_data_train.pkl')
+    train_data_file = os.path.join(data_path,'train_data.pkl')
     test_data_file = os.path.join(data_path,'test_data.pkl')
     diamond_scores_file = os.path.join(data_path,'test_diamond.res')
     obo_path = os.path.join(data_path,'go.obo')

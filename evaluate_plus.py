@@ -153,15 +153,15 @@ def main(train_data_file, test_data_file, terms_file, go_file,
         #print(f'{avg_fp} {avg_ic}')
         precisions.append(prec)
         recalls.append(rec)
-        # print(f'Fscore: {fscore}, Precision: {prec}, Recall: {rec} S: {s}, RU: {ru}, MI: {mi} threshold: {threshold}')
+        print(f'Fscore: {fscore}, Precision: {prec}, Recall: {rec} S: {s}, RU: {ru}, MI: {mi} threshold: {threshold}')
         if fmax < fscore:
             fmax = fscore
             tmax = threshold
         if smin > s:
             smin = s
     print(f'threshold: {tmax}')
-    print(f'Smin: {smin:0.3f}')
     print(f'Fmax: {fmax:0.3f}')
+    print(f'Smin: {smin:0.3f}')
     precisions = np.array(precisions)
     recalls = np.array(recalls)
     sorted_index = np.argsort(recalls)
@@ -169,19 +169,19 @@ def main(train_data_file, test_data_file, terms_file, go_file,
     precisions = precisions[sorted_index]
     aupr = np.trapz(precisions, recalls)
     print(f'AUPR: {aupr:0.3f}')
-    plt.figure()
-    lw = 2
-    plt.plot(recalls, precisions, color='darkorange',
-             lw=lw, label=f'AUPR curve (area = {aupr:0.2f})')
-    plt.xlim([0.0, 1.0])
-    plt.ylim([0.0, 1.05])
-    plt.xlabel('Recall')
-    plt.ylabel('Precision')
-    plt.title('Area Under the Precision-Recall curve')
-    plt.legend(loc="lower right")
-    plt.savefig(f'./aupr_{ont}.pdf')
-    df = pd.DataFrame({'precisions': precisions, 'recalls': recalls})
-    df.to_pickle(f'./PR_{ont}.pkl')
+    # plt.figure()
+    # lw = 2
+    # plt.plot(recalls, precisions, color='darkorange',
+             # lw=lw, label=f'AUPR curve (area = {aupr:0.2f})')
+    # plt.xlim([0.0, 1.0])
+    # plt.ylim([0.0, 1.05])
+    # plt.xlabel('Recall')
+    # plt.ylabel('Precision')
+    # plt.title('Area Under the Precision-Recall curve')
+    # plt.legend(loc="lower right")
+    # plt.savefig(f'./aupr_{ont}.pdf')
+    # df = pd.DataFrame({'precisions': precisions, 'recalls': recalls})
+    # df.to_pickle(f'./PR_{ont}.pkl')
 
 def evaluate_annotations(go, real_annots, pred_annots):
     total = 0
